@@ -3,7 +3,7 @@
 [English](#english) | [中文](#中文)
 
 <div align="center">
-  <img src="favicon.svg" alt="WebNav Hub" width="96">
+  <img src="public/favicon.svg" alt="WebNav Hub" width="96">
 </div>
 
 <a name="english"></a>
