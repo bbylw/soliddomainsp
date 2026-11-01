@@ -161,7 +161,7 @@ Vercel detects `bun.lock` and installs with Bun automatically.
 
 - Add the domain in the platform dashboard, then follow the DNS target it provides (CNAME for subdomains, ALIAS/ANAME or nameservers for apex domains). All five platforms issue HTTPS certificates automatically.
 - `vite.config.ts` sets `base: "./"`, so the same build works at a domain root or under a sub-path such as GitHub Pages project sites.
-- The canonical and Open Graph URLs currently point to `https://domp.ndjp.net/`. If you switch to another domain, update them in `index.html` and `domains.html`.
+- The canonical and Open Graph URLs currently point to `https://solidp.ndjp.net/`. If you switch to another domain, update them in `index.html` and `domains.html`.
 
 ## 🛠 Customization
 
@@ -391,7 +391,7 @@ Vercel 能识别 `bun.lock`，会自动使用 Bun 安装依赖。
 
 - 在平台控制台添加域名后，按提示配置 DNS（子域用 CNAME，根域用 ALIAS/ANAME 或 NS）。上述五个平台都会自动签发 HTTPS 证书。
 - `vite.config.ts` 设置了 `base: "./"`，同一份构建产物既能部署到域名根目录，也能部署到 GitHub Pages 项目页这类子路径。
-- canonical 与 Open Graph 地址当前指向 `https://domp.ndjp.net/`。更换主域名时，请同步修改 `index.html` 与 `domains.html`。
+- canonical 与 Open Graph 地址当前指向 `https://solidp.ndjp.net/`。更换主域名时，请同步修改 `index.html` 与 `domains.html`。
 
 ## 🛠 自定义设置
 
