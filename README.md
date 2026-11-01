@@ -84,24 +84,22 @@ The 实用工具 grid contains one internal card (`"internal": true`) that links
 
 ## 🚀 Free Hosting Platforms
 
-All platforms below publish the same static build. Use these settings unless the platform auto-detects them:
+All platforms below publish the same static build. The project uses Bun and commits `bun.lock`, so every guide installs and builds with Bun:
 
 | Setting | Value |
 | --- | --- |
 | Root directory | `/` |
-| Install command | `npm install` |
-| Build command | `npm run build` |
+| Install command | `bun install` |
+| Build command | `bun run build` |
 | Output directory | `dist` |
-| Node.js | 20.19+ / 22.12+ (22 recommended) |
-
-GitHub Actions builds with Bun; on platforms that support Bun, `bun install && bun run build` can replace the npm commands.
+| Runtime | Bun 1.4+ (Node.js 20.19+ / 22.12+ only if you fall back to npm) |
 
 ### 1. GitHub Pages
 
 This repository already ships with `.github/workflows/deploy.yml`:
 
 1. Push to `main` (or run the workflow manually from the Actions tab).
-2. GitHub Actions installs dependencies, type-checks, and builds with Bun.
+2. GitHub Actions sets up Bun, installs dependencies with `bun install --frozen-lockfile`, and builds with `bun run build`.
 3. The `dist/` artifact is published to GitHub Pages.
 
 For a fork, open **Settings → Pages** and set the source to **GitHub Actions**. The site will be available at `https://<username>.github.io/<repo>/`.
@@ -112,40 +110,50 @@ For a fork, open **Settings → Pages** and set the source to **GitHub Actions**
 2. Authorize GitHub and select this repository.
 3. Set the build options:
    - Root directory: `/`
-   - Build command: `npm run build`
+   - Build command: `bun install && bun run build`
    - Build output directory: `dist`
-   - Environment variable: `NODE_VERSION=22`
+   - Environment variables:
+     - `SKIP_DEPENDENCY_INSTALL=true`
+     - `BUN_VERSION=1.4.4` (optional; the v3 build image already ships Bun 1.4.4)
 4. Click **Save and Deploy**. The site will be available at `https://<project>.pages.dev`.
 5. Optional: bind a custom domain under the project's **Custom domains** tab.
+
+Pages' automatic dependency install does not recognize the text `bun.lock`, hence the install step inside the build command and the skipped auto-install.
 
 ### 3. Netlify
 
 1. Open [Netlify](https://app.netlify.com/) → **Add new site** → **Import an existing project**.
 2. Connect GitHub and select this repository.
 3. Set:
-   - Build command: `npm run build`
+   - Build command: `bun install && bun run build`
    - Publish directory: `dist`
+   - Optional environment variable: `BUN_VERSION=1.4.4`
 4. Click **Deploy**. The site will be available at `https://<site>.netlify.app`.
 5. Optional: add a custom domain under **Domain management**.
+
+Netlify's automatic Bun detection looks for the older binary `bun.lockb`, so this repository's text lockfile is installed explicitly in the build command.
 
 ### 4. Vercel
 
 1. Open [Vercel](https://vercel.com/new) and import this Git repository.
 2. Keep the detected **Vite** preset and confirm:
-   - Build command: `npm run build`
+   - Install command: `bun install`
+   - Build command: `bun run build`
    - Output directory: `dist`
-   - Install command: `npm install`
 3. Click **Deploy**. The site will be available at `https://<project>.vercel.app`.
 4. Optional: add a custom domain under **Settings → Domains**.
+
+Vercel detects `bun.lock` and installs with Bun automatically.
 
 ### 5. EdgeOne Pages
 
 1. Open the [EdgeOne Pages console](https://pages.edgeone.ai/) → **Create project** → import this Git repository.
 2. Set the build options:
    - Root directory: `./`
-   - Build command: `npm run build`
+   - Install command: `bun install`
+   - Build command: `bun run build`
    - Output directory: `dist`
-   - Node.js version: 22
+   - Node.js version: 22 (bundled with Bun)
 3. Click **Deploy**. The site will be available at `https://<project>.edgeone.app`.
 4. Optional: bind a custom domain in the project settings.
 
@@ -306,24 +314,22 @@ This project is open-source and available under the MIT License.
 
 ## 🚀 免费托管平台
 
-以下平台发布同一份静态构建产物。除平台能自动识别外，请使用这些配置：
+以下平台发布同一份静态构建产物。本项目使用 Bun，并以 `bun.lock` 作为唯一锁文件，因此所有教程都用 Bun 安装与构建：
 
 | 配置项 | 值 |
 | --- | --- |
 | 根目录 | `/` |
-| 安装命令 | `npm install` |
-| 构建命令 | `npm run build` |
+| 安装命令 | `bun install` |
+| 构建命令 | `bun run build` |
 | 输出目录 | `dist` |
-| Node.js | 20.19+ / 22.12+（推荐 22） |
-
-GitHub Actions 使用 Bun 构建；支持 Bun 的平台可用 `bun install && bun run build` 替代 npm 命令。
+| 运行时 | Bun 1.4+（仅在改用 npm 时才需要 Node.js 20.19+ / 22.12+） |
 
 ### 1. GitHub Pages
 
 本仓库自带 `.github/workflows/deploy.yml`：
 
 1. 推送代码到 `main` 分支（或在 Actions 中手动触发）
-2. GitHub Actions 安装依赖、执行类型检查，并通过 Bun 构建
+2. GitHub Actions 安装 Bun，执行 `bun install --frozen-lockfile` 安装依赖，并通过 `bun run build` 构建
 3. 将 `dist/` 产物发布到 GitHub Pages
 
 如果 Fork 本仓库，请进入 **Settings → Pages**，将来源设为 **GitHub Actions**。站点地址为 `https://<用户名>.github.io/<仓库名>/`。
@@ -334,40 +340,50 @@ GitHub Actions 使用 Bun 构建；支持 Bun 的平台可用 `bun install && bu
 2. 授权 GitHub 并选择本仓库
 3. 设置构建选项：
    - 根目录：`/`
-   - 构建命令：`npm run build`
+   - 构建命令：`bun install && bun run build`
    - 构建输出目录：`dist`
-   - 环境变量：`NODE_VERSION=22`
+   - 环境变量：
+     - `SKIP_DEPENDENCY_INSTALL=true`
+     - `BUN_VERSION=1.4.4`（可选，v3 构建镜像已内置 Bun 1.4.4）
 4. 点击 **Save and Deploy**，站点地址为 `https://<项目名>.pages.dev`
 5. 可选：在项目的 **Custom domains** 中绑定自定义域名
+
+Pages 的自动依赖安装不识别文本格式的 `bun.lock`，因此在构建命令中显式安装，并关闭自动安装。
 
 ### 3. Netlify
 
 1. 打开 [Netlify](https://app.netlify.com/) → **Add new site** → **Import an existing project**
 2. 连接 GitHub 并选择本仓库
 3. 设置：
-   - 构建命令：`npm run build`
+   - 构建命令：`bun install && bun run build`
    - 发布目录：`dist`
+   - 可选环境变量：`BUN_VERSION=1.4.4`
 4. 点击 **Deploy**，站点地址为 `https://<站点名>.netlify.app`
 5. 可选：在 **Domain management** 中绑定自定义域名
+
+Netlify 的 Bun 自动检测只认旧版二进制锁文件 `bun.lockb`，因此这里在构建命令中显式安装文本格式的 `bun.lock`。
 
 ### 4. Vercel
 
 1. 打开 [Vercel](https://vercel.com/new) 并导入本 Git 仓库
 2. 保留自动识别的 **Vite** 预设，确认：
-   - 构建命令：`npm run build`
+   - 安装命令：`bun install`
+   - 构建命令：`bun run build`
    - 输出目录：`dist`
-   - 安装命令：`npm install`
 3. 点击 **Deploy**，站点地址为 `https://<项目名>.vercel.app`
 4. 可选：在 **Settings → Domains** 中绑定自定义域名
+
+Vercel 能识别 `bun.lock`，会自动使用 Bun 安装依赖。
 
 ### 5. EdgeOne Pages
 
 1. 打开 [EdgeOne Pages 控制台](https://pages.edgeone.ai/) → **创建项目**，导入本 Git 仓库
 2. 设置构建选项：
    - 根目录：`./`
-   - 构建命令：`npm run build`
+   - 安装命令：`bun install`
+   - 构建命令：`bun run build`
    - 输出目录：`dist`
-   - Node.js 版本：22
+   - Node.js 版本：22（已随附 Bun）
 3. 点击 **部署**，站点地址为 `https://<项目名>.edgeone.app`
 4. 可选：在项目设置中绑定自定义域名
 
