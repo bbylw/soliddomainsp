@@ -34,23 +34,38 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 
 ### Technical Improvements
 
-- Data-driven architecture: all categories and links are stored in `links.json`, decoupled from HTML markup
-- Separated stylesheet (`style.css`) and script (`main.js`) shared by both pages
+- Built with **SolidJS 1.9** (latest release), **Vite 8**, and **TypeScript**, compiled to static HTML/CSS/JS
+- Fine-grained reactivity with Solid signals drives link rendering, active navigation state, and hash sync — no virtual DOM
+- Data-driven architecture: categories, links, and the domain page all come from `public/links.json` at runtime, decoupled from markup
+- Multi-page Vite build preserves the original `index.html` and `domains.html` URLs while sharing one component tree
 - Semantic card markup (`<a class="link-card">`) with `:focus-visible` keyboard navigation support
 - Smooth anchor navigation with `scroll-margin-top`, `IntersectionObserver` ScrollSpy, and `history.pushState` hash sync
 - Complete SEO & Open Graph metadata and CDN `preconnect` optimization
-- CSS custom properties for the color palette and streamlined responsive breakpoints (1200px / 768px / 480px / 360px)
-- Custom SVG favicon, no image assets required
+- CSS custom properties for the color palette and four responsive breakpoints (1200px / 768px / 480px / 360px)
+- Custom SVG favicon, no bitmap assets required
 
 ## 📂 Project Structure
 
 ```
-├── index.html      # Home page shell — top nav & semantic container
-├── domains.html    # Free domain / DNS sub-page shell
-├── links.json      # Centralized link data (6 categories / 160 home cards + 30 domain cards)
-├── style.css       # Shared stylesheet for both pages
-├── main.js         # Shared behaviour: JSON rendering, ScrollSpy, anchor nav, footer year
-├── favicon.svg     # Site icon
+├── .github/
+│   └── workflows/deploy.yml  # CI: build and deploy to GitHub Pages
+├── public/
+│   ├── links.json            # Centralized link data (6 categories / 160 home cards + 30 domain cards)
+│   └── favicon.svg           # Site icon
+├── src/
+│   ├── components/           # LinkCard, SiteHeader, TopNav, SiteFooter
+│   ├── data/links.ts         # Runtime loader for links.json
+│   ├── pages/                # Home and Domains page components
+│   ├── home.tsx              # Home entry (mounts the Solid app)
+│   ├── domains.tsx           # Domains entry (mounts the Solid app)
+│   ├── nav.ts                # Top navigation items
+│   └── types.ts              # Shared link/category types
+├── index.html                # Vite entry — home page
+├── domains.html              # Vite entry — free domain / DNS sub-page
+├── style.css                 # Shared stylesheet for both pages
+├── vite.config.ts            # Multi-page build configuration
+├── tsconfig.json
+├── package.json
 └── README.md
 ```
 
@@ -65,23 +80,37 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 | 云存储 | `cloud-storage` | 7 |
 | 电子邮箱 | `email` | 8 |
 
-The 实用工具 grid contains one internal card (`"internal": true`) that links to `domains.html`. The sub-page itself is rendered from the `domains` array in `links.json`.
+The 实用工具 grid contains one internal card (`"internal": true`) that links to `domains.html`. The sub-page itself is rendered from the `domains` array in `public/links.json`.
+
+## 🧑‍💻 Local Development
+
+```bash
+bun install      # install dependencies
+bun run dev      # start the Vite dev server
+bun run build    # type-check and build to dist/
+bun run preview  # preview the production build
+```
+
+Bun is recommended; the build also works with Node.js 20.19+ / 22.12+ and npm.
 
 ## 🚀 Deployment Options
 
 ### GitHub Pages Deployment
 
-1. Fork this repository
-2. Go to repository Settings > Pages
-3. Select main branch as source
-4. Your site will be available at `https://[username].github.io/[repo-name]`
+This repository ships with `.github/workflows/deploy.yml`:
+
+1. Push to `main` (or run the workflow manually)
+2. GitHub Actions installs dependencies, type-checks, and builds with `bun run build`
+3. The `dist/` artifact is published to GitHub Pages
+
+For a fork, go to repository Settings > Pages and set the source to **GitHub Actions**.
 
 ### Cloudflare Pages Deployment
 
 1. Connect your GitHub repository to Cloudflare Pages
 2. Set build settings:
-   - Build command: `N/A` (static site)
-   - Build output directory: `/`
+   - Build command: `bun run build`
+   - Build output directory: `dist`
 3. Deploy and access via Cloudflare's URL
 
 ### Custom Domain Setup
@@ -95,7 +124,7 @@ The 实用工具 grid contains one internal card (`"internal": true`) that links
 
 ### Adding a New Link
 
-Append an entry to the target category's `links` array (or to the `domains` array) in `links.json`:
+Append an entry to the target category's `links` array (or to the `domains` array) in `public/links.json`:
 
 ```json
 {
@@ -105,11 +134,11 @@ Append an entry to the target category's `links` array (or to the `domains` arra
 }
 ```
 
-For internal links that should open in the same tab, add `"internal": true`. At runtime, `main.js` renders each item as a semantic `<a class="link-card">` element.
+For internal links that should open in the same tab, add `"internal": true`. At runtime, the Solid app renders each item as a semantic `<a class="link-card">` element.
 
 ### Adding a New Category
 
-1. Add a new category object to the `categories` array in `links.json`:
+1. Add a new category object to the `categories` array in `public/links.json`:
 
 ```json
 {
@@ -125,13 +154,13 @@ For internal links that should open in the same tab, add `"internal": true`. At 
 }
 ```
 
-2. Add a matching navigation item to `.top-nav` in `index.html`:
+2. Add a matching navigation item to `src/nav.ts`:
 
-```html
-<li><a href="#[CATEGORY-ID]">[CATEGORY-NAME]</a></li>
+```ts
+{ href: "#[CATEGORY-ID]", label: "[CATEGORY-NAME]" },
 ```
 
-`main.js` automatically renders the new section and wires up smooth scrolling and ScrollSpy active-state highlighting.
+The Solid app automatically renders the new section and wires up smooth scrolling and ScrollSpy active-state highlighting.
 
 ### Changing Colors
 
@@ -148,7 +177,7 @@ All colors live in the `:root` block at the top of `style.css`:
 
 ## 📱 Browser Support
 
-- Modern browsers with CSS Grid and `fetch` / `IntersectionObserver` support
+- Modern browsers with CSS Grid, native ES modules, `fetch`, and `IntersectionObserver` support
 - Responsive down to 360px viewport width
 
 ## 🔒 Security
@@ -192,8 +221,10 @@ This project is open-source and available under the MIT License.
 
 ### 技术改进
 
-- 数据与视图解耦：所有分类与卡片数据集中在 `links.json` 中维护，由 `main.js` 动态渲染
-- 样式与脚本分离为 `style.css` 和 `main.js`，两个页面共用
+- 基于 **SolidJS 1.9**（当前最新发行版）、**Vite 8** 与 **TypeScript** 构建，编译为静态 HTML/CSS/JS
+- 使用 Solid 细粒度响应式信号驱动卡片渲染、导航高亮与 hash 同步，无虚拟 DOM
+- 数据与视图解耦：分类、链接与域名子页数据统一在 `public/links.json` 中维护，运行时加载
+- Vite 多页构建保留原有 `index.html` 与 `domains.html` 路径，同时共用一套 Solid 组件
 - 语义化卡片结构（`<a class="link-card">`），支持 `:focus-visible` 键盘无障碍导航
 - 锚点导航平滑滚动（带 `scroll-margin-top` 防遮挡），配合 `IntersectionObserver` 滚动监听（ScrollSpy）与 `history.pushState` 自动同步高亮和地址栏
 - 完善的 SEO 与 Open Graph 社交分享元数据，以及 CDN `preconnect` 预连接优化
@@ -203,12 +234,25 @@ This project is open-source and available under the MIT License.
 ## 📂 项目结构
 
 ```
-├── index.html      # 首页骨架 — 顶部导航与语义化容器
-├── domains.html    # 免费域名 / DNS 子页骨架
-├── links.json      # 集中式链接数据源（首页 6 个分类 160 张卡片 + 子页 30 张卡片）
-├── style.css       # 两个页面共用的样式表
-├── main.js         # 共用行为：JSON 数据渲染、ScrollSpy、锚点导航、年份更新
-├── favicon.svg     # 站点图标
+├── .github/
+│   └── workflows/deploy.yml  # CI：构建并部署到 GitHub Pages
+├── public/
+│   ├── links.json            # 集中式链接数据源（首页 6 个分类 160 张卡片 + 子页 30 张卡片）
+│   └── favicon.svg           # 站点图标
+├── src/
+│   ├── components/           # LinkCard、SiteHeader、TopNav、SiteFooter 组件
+│   ├── data/links.ts         # links.json 运行时加载器
+│   ├── pages/                # 首页与域名子页组件
+│   ├── home.tsx              # 首页入口（挂载 Solid 应用）
+│   ├── domains.tsx           # 域名页入口（挂载 Solid 应用）
+│   ├── nav.ts                # 顶部导航项
+│   └── types.ts              # 链接与分类类型定义
+├── index.html                # Vite 入口 — 首页
+├── domains.html              # Vite 入口 — 免费域名 / DNS 子页
+├── style.css                 # 两个页面共用的样式表
+├── vite.config.ts            # 多页构建配置
+├── tsconfig.json
+├── package.json
 └── README.md
 ```
 
@@ -223,23 +267,37 @@ This project is open-source and available under the MIT License.
 | 云存储 | `cloud-storage` | 7 |
 | 电子邮箱 | `email` | 8 |
 
-实用工具网格中有一张内部卡片（`"internal": true`）指向 `domains.html`。该子页的数据存储在 `links.json` 的 `domains` 数组中。
+实用工具网格中有一张内部卡片（`"internal": true`）指向 `domains.html`。该子页的数据存储在 `public/links.json` 的 `domains` 数组中。
+
+## 🧑‍💻 本地开发
+
+```bash
+bun install      # 安装依赖
+bun run dev      # 启动 Vite 开发服务器
+bun run build    # 类型检查并构建到 dist/
+bun run preview  # 预览生产构建
+```
+
+推荐使用 Bun；Node.js 20.19+ / 22.12+ 配合 npm 同样可以构建。
 
 ## 🚀 部署选项
 
 ### GitHub Pages 部署
 
-1. Fork 本仓库
-2. 进入仓库设置 > Pages
-3. 选择 main 分支作为源
-4. 您的站点将在 `https://[用户名].github.io/[仓库名]` 可用
+本仓库自带 `.github/workflows/deploy.yml`：
+
+1. 推送代码到 `main` 分支（或在 Actions 中手动触发）
+2. GitHub Actions 安装依赖、执行类型检查，并通过 `bun run build` 构建
+3. 将 `dist/` 产物发布到 GitHub Pages
+
+如果 Fork 本仓库，请进入仓库设置 > Pages，将来源设为 **GitHub Actions**。
 
 ### Cloudflare Pages 部署
 
 1. 将您的 GitHub 仓库连接到 Cloudflare Pages
 2. 设置构建选项：
-   - 构建命令：`N/A`（静态站点）
-   - 构建输出目录：`/`
+   - 构建命令：`bun run build`
+   - 构建输出目录：`dist`
 3. 部署并通过 Cloudflare 提供的 URL 访问
 
 ### 自定义域名设置
@@ -253,7 +311,7 @@ This project is open-source and available under the MIT License.
 
 ### 添加新链接
 
-只需在 `links.json` 对应分类的 `links` 数组（或子页的 `domains` 数组）中新增一项：
+只需在 `public/links.json` 对应分类的 `links` 数组（或子页的 `domains` 数组）中新增一项：
 
 ```json
 {
@@ -263,11 +321,11 @@ This project is open-source and available under the MIT License.
 }
 ```
 
-如果是站内跳转链接（无需新标签页打开），可额外加上 `"internal": true`。`main.js` 会在运行时将其渲染为语义化的 `<a class="link-card">` 元素。
+如果是站内跳转链接（无需新标签页打开），可额外加上 `"internal": true`。Solid 应用会在运行时将其渲染为语义化的 `<a class="link-card">` 元素。
 
 ### 添加新分类
 
-1. 在 `links.json` 的 `categories` 数组中新增一个分类对象：
+1. 在 `public/links.json` 的 `categories` 数组中新增一个分类对象：
 
 ```json
 {
@@ -283,13 +341,13 @@ This project is open-source and available under the MIT License.
 }
 ```
 
-2. 在 `index.html` 的 `.top-nav` 导航栏中添加对应项：
+2. 在 `src/nav.ts` 中添加对应的导航项：
 
-```html
-<li><a href="#[分类ID]">[分类名称]</a></li>
+```ts
+{ href: "#[分类ID]", label: "[分类名称]" },
 ```
 
-`main.js` 会自动渲染该分类区块，并绑定平滑滚动与 ScrollSpy 滚动高亮状态。
+Solid 应用会自动渲染该分类区块，并绑定平滑滚动与 ScrollSpy 滚动高亮状态。
 
 ### 修改配色
 
@@ -306,7 +364,7 @@ This project is open-source and available under the MIT License.
 
 ## 📱 浏览器支持
 
-- 支持具有 CSS Grid、`fetch` 及 `IntersectionObserver` 功能的现代浏览器
+- 支持具有 CSS Grid、原生 ES modules、`fetch` 及 `IntersectionObserver` 功能的现代浏览器
 - 响应式适配至 360px 视口宽度
 
 ## 🔒 安全性
