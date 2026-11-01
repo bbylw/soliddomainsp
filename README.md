@@ -82,43 +82,78 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 
 The 实用工具 grid contains one internal card (`"internal": true`) that links to `domains.html`. The sub-page itself is rendered from the `domains` array in `public/links.json`.
 
-## 🧑‍💻 Local Development
+## 🚀 Free Hosting Platforms
 
-```bash
-bun install      # install dependencies
-bun run dev      # start the Vite dev server
-bun run build    # type-check and build to dist/
-bun run preview  # preview the production build
-```
+All platforms below publish the same static build. Use these settings unless the platform auto-detects them:
 
-Bun is recommended; the build also works with Node.js 20.19+ / 22.12+ and npm.
+| Setting | Value |
+| --- | --- |
+| Root directory | `/` |
+| Install command | `npm install` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Node.js | 20.19+ / 22.12+ (22 recommended) |
 
-## 🚀 Deployment Options
+GitHub Actions builds with Bun; on platforms that support Bun, `bun install && bun run build` can replace the npm commands.
 
-### GitHub Pages Deployment
+### 1. GitHub Pages
 
-This repository ships with `.github/workflows/deploy.yml`:
+This repository already ships with `.github/workflows/deploy.yml`:
 
-1. Push to `main` (or run the workflow manually)
-2. GitHub Actions installs dependencies, type-checks, and builds with `bun run build`
-3. The `dist/` artifact is published to GitHub Pages
+1. Push to `main` (or run the workflow manually from the Actions tab).
+2. GitHub Actions installs dependencies, type-checks, and builds with Bun.
+3. The `dist/` artifact is published to GitHub Pages.
 
-For a fork, go to repository Settings > Pages and set the source to **GitHub Actions**.
+For a fork, open **Settings → Pages** and set the source to **GitHub Actions**. The site will be available at `https://<username>.github.io/<repo>/`.
 
-### Cloudflare Pages Deployment
+### 2. Cloudflare Pages
 
-1. Connect your GitHub repository to Cloudflare Pages
-2. Set build settings:
-   - Build command: `bun run build`
+1. Open the Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
+2. Authorize GitHub and select this repository.
+3. Set the build options:
+   - Root directory: `/`
+   - Build command: `npm run build`
    - Build output directory: `dist`
-3. Deploy and access via Cloudflare's URL
+   - Environment variable: `NODE_VERSION=22`
+4. Click **Save and Deploy**. The site will be available at `https://<project>.pages.dev`.
+5. Optional: bind a custom domain under the project's **Custom domains** tab.
 
-### Custom Domain Setup
+### 3. Netlify
 
-1. Register at [dynv6](https://dynv6.com)
-2. Add a new domain and configure DNS settings
-3. Point domain to your deployment URL
-4. Update DNS settings in your deployment platform
+1. Open [Netlify](https://app.netlify.com/) → **Add new site** → **Import an existing project**.
+2. Connect GitHub and select this repository.
+3. Set:
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+4. Click **Deploy**. The site will be available at `https://<site>.netlify.app`.
+5. Optional: add a custom domain under **Domain management**.
+
+### 4. Vercel
+
+1. Open [Vercel](https://vercel.com/new) and import this Git repository.
+2. Keep the detected **Vite** preset and confirm:
+   - Build command: `npm run build`
+   - Output directory: `dist`
+   - Install command: `npm install`
+3. Click **Deploy**. The site will be available at `https://<project>.vercel.app`.
+4. Optional: add a custom domain under **Settings → Domains**.
+
+### 5. EdgeOne Pages
+
+1. Open the [EdgeOne Pages console](https://pages.edgeone.ai/) → **Create project** → import this Git repository.
+2. Set the build options:
+   - Root directory: `./`
+   - Build command: `npm run build`
+   - Output directory: `dist`
+   - Node.js version: 22
+3. Click **Deploy**. The site will be available at `https://<project>.edgeone.app`.
+4. Optional: bind a custom domain in the project settings.
+
+### Custom Domains
+
+- Add the domain in the platform dashboard, then follow the DNS target it provides (CNAME for subdomains, ALIAS/ANAME or nameservers for apex domains). All five platforms issue HTTPS certificates automatically.
+- `vite.config.ts` sets `base: "./"`, so the same build works at a domain root or under a sub-path such as GitHub Pages project sites.
+- The canonical and Open Graph URLs currently point to `https://domp.ndjp.net/`. If you switch to another domain, update them in `index.html` and `domains.html`.
 
 ## 🛠 Customization
 
@@ -269,43 +304,78 @@ This project is open-source and available under the MIT License.
 
 实用工具网格中有一张内部卡片（`"internal": true`）指向 `domains.html`。该子页的数据存储在 `public/links.json` 的 `domains` 数组中。
 
-## 🧑‍💻 本地开发
+## 🚀 免费托管平台
 
-```bash
-bun install      # 安装依赖
-bun run dev      # 启动 Vite 开发服务器
-bun run build    # 类型检查并构建到 dist/
-bun run preview  # 预览生产构建
-```
+以下平台发布同一份静态构建产物。除平台能自动识别外，请使用这些配置：
 
-推荐使用 Bun；Node.js 20.19+ / 22.12+ 配合 npm 同样可以构建。
+| 配置项 | 值 |
+| --- | --- |
+| 根目录 | `/` |
+| 安装命令 | `npm install` |
+| 构建命令 | `npm run build` |
+| 输出目录 | `dist` |
+| Node.js | 20.19+ / 22.12+（推荐 22） |
 
-## 🚀 部署选项
+GitHub Actions 使用 Bun 构建；支持 Bun 的平台可用 `bun install && bun run build` 替代 npm 命令。
 
-### GitHub Pages 部署
+### 1. GitHub Pages
 
 本仓库自带 `.github/workflows/deploy.yml`：
 
 1. 推送代码到 `main` 分支（或在 Actions 中手动触发）
-2. GitHub Actions 安装依赖、执行类型检查，并通过 `bun run build` 构建
+2. GitHub Actions 安装依赖、执行类型检查，并通过 Bun 构建
 3. 将 `dist/` 产物发布到 GitHub Pages
 
-如果 Fork 本仓库，请进入仓库设置 > Pages，将来源设为 **GitHub Actions**。
+如果 Fork 本仓库，请进入 **Settings → Pages**，将来源设为 **GitHub Actions**。站点地址为 `https://<用户名>.github.io/<仓库名>/`。
 
-### Cloudflare Pages 部署
+### 2. Cloudflare Pages
 
-1. 将您的 GitHub 仓库连接到 Cloudflare Pages
-2. 设置构建选项：
-   - 构建命令：`bun run build`
+1. 打开 Cloudflare 控制台 → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+2. 授权 GitHub 并选择本仓库
+3. 设置构建选项：
+   - 根目录：`/`
+   - 构建命令：`npm run build`
    - 构建输出目录：`dist`
-3. 部署并通过 Cloudflare 提供的 URL 访问
+   - 环境变量：`NODE_VERSION=22`
+4. 点击 **Save and Deploy**，站点地址为 `https://<项目名>.pages.dev`
+5. 可选：在项目的 **Custom domains** 中绑定自定义域名
 
-### 自定义域名设置
+### 3. Netlify
 
-1. 在 [dynv6](https://dynv6.com) 注册
-2. 添加新域名并配置 DNS 设置
-3. 将域名指向您的部署 URL
-4. 在部署平台更新 DNS 设置
+1. 打开 [Netlify](https://app.netlify.com/) → **Add new site** → **Import an existing project**
+2. 连接 GitHub 并选择本仓库
+3. 设置：
+   - 构建命令：`npm run build`
+   - 发布目录：`dist`
+4. 点击 **Deploy**，站点地址为 `https://<站点名>.netlify.app`
+5. 可选：在 **Domain management** 中绑定自定义域名
+
+### 4. Vercel
+
+1. 打开 [Vercel](https://vercel.com/new) 并导入本 Git 仓库
+2. 保留自动识别的 **Vite** 预设，确认：
+   - 构建命令：`npm run build`
+   - 输出目录：`dist`
+   - 安装命令：`npm install`
+3. 点击 **Deploy**，站点地址为 `https://<项目名>.vercel.app`
+4. 可选：在 **Settings → Domains** 中绑定自定义域名
+
+### 5. EdgeOne Pages
+
+1. 打开 [EdgeOne Pages 控制台](https://pages.edgeone.ai/) → **创建项目**，导入本 Git 仓库
+2. 设置构建选项：
+   - 根目录：`./`
+   - 构建命令：`npm run build`
+   - 输出目录：`dist`
+   - Node.js 版本：22
+3. 点击 **部署**，站点地址为 `https://<项目名>.edgeone.app`
+4. 可选：在项目设置中绑定自定义域名
+
+### 自定义域名
+
+- 在平台控制台添加域名后，按提示配置 DNS（子域用 CNAME，根域用 ALIAS/ANAME 或 NS）。上述五个平台都会自动签发 HTTPS 证书。
+- `vite.config.ts` 设置了 `base: "./"`，同一份构建产物既能部署到域名根目录，也能部署到 GitHub Pages 项目页这类子路径。
+- canonical 与 Open Graph 地址当前指向 `https://domp.ndjp.net/`。更换主域名时，请同步修改 `index.html` 与 `domains.html`。
 
 ## 🛠 自定义设置
 
