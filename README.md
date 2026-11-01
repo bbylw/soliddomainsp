@@ -40,7 +40,7 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 - Multi-page Vite build preserves the original `index.html` and `domains.html` URLs while sharing one component tree
 - Semantic card markup (`<a class="link-card">`) with `:focus-visible` keyboard navigation support
 - Smooth anchor navigation with `scroll-margin-top`, `IntersectionObserver` ScrollSpy, and `history.pushState` hash sync
-- Complete SEO & Open Graph metadata and CDN `preconnect` optimization
+- Complete SEO & Open Graph metadata (with a 1200×630 PNG share card), SRI on the CDN stylesheet, and `preconnect` optimization
 - CSS custom properties for the color palette and four responsive breakpoints (1200px / 768px / 480px / 360px)
 - Custom SVG favicon, no bitmap assets required
 
@@ -51,7 +51,9 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 │   └── workflows/deploy.yml  # CI: build and deploy to GitHub Pages
 ├── public/
 │   ├── links.json            # Centralized link data (6 categories / 160 home cards + 30 domain cards)
-│   └── favicon.svg           # Site icon
+│   ├── favicon.svg           # Site icon
+│   ├── og-card.svg/.png      # Social share card (SVG source + rendered 1200×630 PNG for og:image)
+│   └── CNAME                 # GitHub Pages custom domain (solidp.ndjp.net)
 ├── src/
 │   ├── components/           # LinkCard, SiteHeader, TopNav, SiteFooter
 │   ├── data/links.ts         # Runtime loader for links.json
@@ -270,7 +272,7 @@ This project is open-source and available under the MIT License.
 - Vite 多页构建保留原有 `index.html` 与 `domains.html` 路径，同时共用一套 Solid 组件
 - 语义化卡片结构（`<a class="link-card">`），支持 `:focus-visible` 键盘无障碍导航
 - 锚点导航平滑滚动（带 `scroll-margin-top` 防遮挡），配合 `IntersectionObserver` 滚动监听（ScrollSpy）与 `history.pushState` 自动同步高亮和地址栏
-- 完善的 SEO 与 Open Graph 社交分享元数据，以及 CDN `preconnect` 预连接优化
+- 完善的 SEO 与 Open Graph 社交分享元数据（含 1200×630 PNG 分享卡），CDN 样式表带 SRI 完整性校验，以及 `preconnect` 预连接优化
 - 使用 CSS 自定义属性管理配色，精简四档响应式断点（1200px / 768px / 480px / 360px）
 - 自绘 SVG 图标，不依赖任何位图资源
 
@@ -281,7 +283,9 @@ This project is open-source and available under the MIT License.
 │   └── workflows/deploy.yml  # CI：构建并部署到 GitHub Pages
 ├── public/
 │   ├── links.json            # 集中式链接数据源（首页 6 个分类 160 张卡片 + 子页 30 张卡片）
-│   └── favicon.svg           # 站点图标
+│   ├── favicon.svg           # 站点图标
+│   ├── og-card.svg/.png      # 社交分享卡片（SVG 源文件 + 渲染好的 1200×630 PNG，og:image 用）
+│   └── CNAME                 # GitHub Pages 自定义域名（solidp.ndjp.net）
 ├── src/
 │   ├── components/           # LinkCard、SiteHeader、TopNav、SiteFooter 组件
 │   ├── data/links.ts         # links.json 运行时加载器

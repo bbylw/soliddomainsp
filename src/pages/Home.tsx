@@ -7,6 +7,7 @@ import {
   onMount,
 } from "solid-js";
 import LinkCard from "../components/LinkCard";
+import LoadState from "../components/LoadState";
 import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
 import TopNav from "../components/TopNav";
@@ -14,7 +15,7 @@ import { createLinksResource } from "../data/links";
 import { NAV_ITEMS } from "../nav";
 
 export default function Home() {
-  const [data] = createLinksResource();
+  const [data, { refetch }] = createLinksResource();
   const [activeHash, setActiveHash] = createSignal(NAV_ITEMS[0].href);
   let mainEl!: HTMLElement;
   let scrollTimer: number | undefined;
@@ -93,6 +94,7 @@ export default function Home() {
       <SiteHeader />
       <TopNav activeHash={activeHash()} onNavigate={handleNavigate} />
       <main id="app-main" data-page="home" ref={mainEl}>
+        <LoadState loading={data.loading} error={data.error} onRetry={refetch} />
         <Show when={data()}>
           {(links) => (
             <For each={links().categories}>

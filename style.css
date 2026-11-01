@@ -173,6 +173,31 @@ section[id] {
   padding: 0 0.3rem;
 }
 
+.load-status {
+  margin: 3rem auto;
+  text-align: center;
+  color: #ccc;
+  font-size: 0.95rem;
+}
+
+.load-status button {
+  margin-left: 0.5rem;
+  background: none;
+  border: 1px solid var(--primary-color);
+  border-radius: 1rem;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  padding: 0.2rem 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.load-status button:hover,
+.load-status button:focus-visible {
+  background-color: var(--primary-color);
+  color: #000;
+}
+
 footer {
   background-color: #000;
   color: #ccc;
