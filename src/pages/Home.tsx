@@ -17,32 +17,53 @@ import { createLinks } from "../data/links";
 import { NAV_ITEMS } from "../nav";
 
 interface NavState {
-  clickScrolling: boolean;
+  /** Hash pinned by a programmatic scroll; ScrollSpy stays quiet until then. */
+  pinnedHash: string | null;
 }
 
 export default function Home() {
   const data = createLinks();
   const [activeHash, setActiveHash] = createSignal(NAV_ITEMS[0].href);
-  const navState: NavState = { clickScrolling: false };
-  let scrollTimer: number | undefined;
+  const navState: NavState = { pinnedHash: null };
+  let pinTimer: number | undefined;
+
+  function releaseActiveHashPin() {
+    window.clearTimeout(pinTimer);
+    window.removeEventListener("scroll", scheduleActiveHashPinRelease);
+    navState.pinnedHash = null;
+  }
+
+  function scheduleActiveHashPinRelease() {
+    // A smooth scroll keeps emitting scroll events, so the pin lifts only once
+    // the page has been still for a moment (also covers interrupted scrolls).
+    window.clearTimeout(pinTimer);
+    pinTimer = window.setTimeout(releaseActiveHashPin, 150);
+  }
+
+  function pinActiveHash(hash: string) {
+    navState.pinnedHash = hash;
+    setActiveHash(hash);
+    window.addEventListener("scroll", scheduleActiveHashPinRelease, {
+      passive: true,
+    });
+    scheduleActiveHashPinRelease();
+  }
+
+  const scrollToHash = (hash: string) => {
+    const target = document.getElementById(hash.slice(1));
+    if (!target) return undefined;
+
+    pinActiveHash(hash);
+    target.scrollIntoView({ behavior: "smooth" });
+    return target;
+  };
 
   const handleNavigate = (event: MouseEvent, href: string) => {
     event.preventDefault();
-    const target = document.getElementById(href.slice(1));
-    if (!target) return;
-
-    navState.clickScrolling = true;
-    window.clearTimeout(scrollTimer);
-    setActiveHash(href);
-
-    target.scrollIntoView({ behavior: "smooth" });
+    if (!scrollToHash(href)) return;
 
     const url = `${location.protocol}//${location.host}${location.pathname}${href}`;
     history.pushState({ path: url }, "", url);
-
-    scrollTimer = window.setTimeout(() => {
-      navState.clickScrolling = false;
-    }, 700);
   };
 
   const syncActiveFromHash = () => {
@@ -52,11 +73,7 @@ export default function Home() {
       return;
     }
 
-    const target = document.getElementById(hash.slice(1));
-    if (!target) return;
-
-    target.scrollIntoView({ behavior: "smooth" });
-    setActiveHash(hash);
+    scrollToHash(hash);
   };
 
   onSettled(() => {
@@ -64,7 +81,7 @@ export default function Home() {
 
     return () => {
       window.removeEventListener("hashchange", syncActiveFromHash);
-      window.clearTimeout(scrollTimer);
+      releaseActiveHashPin();
     };
   });
 
@@ -104,27 +121,53 @@ function CategorySections(props: {
     () => props.links,
     () => {
       const mainEl = document.getElementById("app-main");
-      const sections = mainEl?.querySelectorAll("section[id]") ?? [];
-      let observer: IntersectionObserver | undefined;
+      const sections = Array.from(
+        mainEl?.querySelectorAll<HTMLElement>("section[id]") ?? [],
+      );
+      let frame: number | undefined;
 
-      if ("IntersectionObserver" in window && sections.length) {
-        observer = new IntersectionObserver(
-          (entries) => {
-            if (props.navState.clickScrolling) return;
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                props.onActiveHashChange(`#${entry.target.id}`);
-              }
-            });
-          },
-          { rootMargin: "-15% 0px -75% 0px", threshold: 0 },
-        );
-        sections.forEach((section) => observer?.observe(section));
-      }
+      // ScrollSpy by position rather than by intersection: the section that owns
+      // the reading line wins, so the first category is active at the very top
+      // and the last one at the bottom, where no single section intersects.
+      const updateActive = () => {
+        if (props.navState.pinnedHash !== null) return;
 
+        const line = window.innerHeight * 0.2;
+        const atBottom =
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 2;
+        let current = atBottom
+          ? sections[sections.length - 1]
+          : sections[0];
+
+        if (!atBottom) {
+          for (const section of sections) {
+            if (section.getBoundingClientRect().top <= line) current = section;
+          }
+        }
+
+        if (current) props.onActiveHashChange(`#${current.id}`);
+      };
+
+      const scheduleUpdate = () => {
+        if (frame !== undefined) return;
+        frame = requestAnimationFrame(() => {
+          frame = undefined;
+          updateActive();
+        });
+      };
+
+      window.addEventListener("scroll", scheduleUpdate, { passive: true });
+      window.addEventListener("resize", scheduleUpdate, { passive: true });
+
+      updateActive();
       props.onSectionsReady();
 
-      return () => observer?.disconnect();
+      return () => {
+        window.removeEventListener("scroll", scheduleUpdate);
+        window.removeEventListener("resize", scheduleUpdate);
+        if (frame !== undefined) cancelAnimationFrame(frame);
+      };
     },
   );
 

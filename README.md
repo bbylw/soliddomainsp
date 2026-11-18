@@ -39,7 +39,7 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 - Data-driven architecture: categories, links, and the domain page all come from `public/links.json` at runtime, decoupled from markup
 - Multi-page Vite build preserves the original `index.html` and `domains.html` URLs while sharing one component tree
 - Semantic card markup (`<a class="link-card">`) with `:focus-visible` keyboard navigation support
-- Smooth anchor navigation with `scroll-margin-top`, `IntersectionObserver` ScrollSpy, and `history.pushState` hash sync
+- Smooth anchor navigation with `scroll-margin-top`, a scroll-position ScrollSpy, and `history.pushState` hash sync
 - Complete SEO & Open Graph metadata (with a 1200×630 PNG share card), SRI on the CDN stylesheet, and `preconnect` optimization
 - CSS custom properties for the color palette and four responsive breakpoints (1200px / 768px / 480px / 360px)
 - Custom SVG favicon, no bitmap assets required
@@ -222,7 +222,7 @@ All colors live in the `:root` block at the top of `style.css`:
 
 ## 📱 Browser Support
 
-- Modern browsers with CSS Grid, native ES modules, `fetch`, and `IntersectionObserver` support
+- Modern browsers with CSS Grid, native ES modules and `fetch` support
 - Responsive down to 360px viewport width
 
 ## 🔒 Security
@@ -271,7 +271,7 @@ This project is open-source and available under the MIT License.
 - 数据与视图解耦：分类、链接与域名子页数据统一在 `public/links.json` 中维护，运行时加载
 - Vite 多页构建保留原有 `index.html` 与 `domains.html` 路径，同时共用一套 Solid 组件
 - 语义化卡片结构（`<a class="link-card">`），支持 `:focus-visible` 键盘无障碍导航
-- 锚点导航平滑滚动（带 `scroll-margin-top` 防遮挡），配合 `IntersectionObserver` 滚动监听（ScrollSpy）与 `history.pushState` 自动同步高亮和地址栏
+- 锚点导航平滑滚动（带 `scroll-margin-top` 防遮挡），配合基于滚动位置的 ScrollSpy 监听与 `history.pushState` 自动同步高亮和地址栏
 - 完善的 SEO 与 Open Graph 社交分享元数据（含 1200×630 PNG 分享卡），CDN 样式表带 SRI 完整性校验，以及 `preconnect` 预连接优化
 - 使用 CSS 自定义属性管理配色，精简四档响应式断点（1200px / 768px / 480px / 360px）
 - 自绘 SVG 图标，不依赖任何位图资源
@@ -454,7 +454,7 @@ Solid 应用会自动渲染该分类区块，并绑定平滑滚动与 ScrollSpy 
 
 ## 📱 浏览器支持
 
-- 支持具有 CSS Grid、原生 ES modules、`fetch` 及 `IntersectionObserver` 功能的现代浏览器
+- 支持具有 CSS Grid、原生 ES modules、`fetch` 功能的现代浏览器
 - 响应式适配至 360px 视口宽度
 
 ## 🔒 安全性
