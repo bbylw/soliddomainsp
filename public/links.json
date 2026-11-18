@@ -170,9 +170,9 @@
           "icon": "fa-brands fa-x-twitter"
         },
         {
-          "title": "pce计算",
-          "url": "https://ascvdpce.186404.xyz/",
-          "icon": "fa-solid fa-heart-pulse"
+          "title": "instabox",
+          "url": "https://instabox.sh/",
+          "icon": "fa-solid fa-box"
         },
         {
           "title": "agnes-ai",
@@ -185,9 +185,9 @@
           "icon": "fa-solid fa-v"
         },
         {
-          "title": "cto.new",
-          "url": "https://cto.new/",
-          "icon": "fa-solid fa-v"
+          "title": "Duck.ai",
+          "url": "https://duck.ai/",
+          "icon": "fa-solid fa-dove"
         },
         {
           "title": "deepseek",
@@ -225,14 +225,19 @@
           "icon": "fa-solid fa-code"
         },
         {
-          "title": "codebuff",
-          "url": "https://www.codebuff.com/",
+          "title": "freebuff",
+          "url": "https://freebuff.com/",
           "icon": "fa-solid fa-robot"
         },
         {
           "title": "ampcode",
           "url": "https://ampcode.com/",
           "icon": "fa-solid fa-code"
+        },
+        {
+          "title": "DeepAI",
+          "url": "https://deepai.org/",
+          "icon": "fa-solid fa-brain"
         },
         {
           "title": "硅基流动",
@@ -323,7 +328,12 @@
         {
           "title": "netlify",
           "url": "https://www.netlify.com/",
-          "icon": "fa-solid fa-n"
+          "icon": "fa-brands fa-n"
+        },
+        {
+          "title": "cloudzyro",
+          "url": "https://cloudzyro.com/",
+          "icon": "fa-solid fa-cloud"
         },
         {
           "title": "savefrom",
@@ -693,9 +703,19 @@
           "icon": "fa-solid fa-thumbtack"
         },
         {
+          "title": "sms24免费接码",
+          "url": "https://sms24.me/",
+          "icon": "fa-solid fa-comment-sms"
+        },
+        {
           "title": "Openverse",
           "url": "https://openverse.org/",
           "icon": "fa-brands fa-creative-commons"
+        },
+        {
+          "title": "黑客书架",
+          "url": "https://hackerbooks.qiaomu.ai/",
+          "icon": "fa-solid fa-book-bookmark"
         }
       ]
     },
@@ -938,6 +958,16 @@
       "title": "devs.surf 免费域名",
       "url": "https://devs.surf/",
       "icon": "fa-solid fa-water"
+    },
+    {
+      "title": "devs.li 免费域名",
+      "url": "https://devs.li/",
+      "icon": "fa-solid fa-code"
+    },
+    {
+      "title": "Zerexa Domains 免费域名",
+      "url": "https://nic.fj.kg/",
+      "icon": "fa-solid fa-globe"
     },
     {
       "title": "dns.he域名托管",

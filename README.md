@@ -28,8 +28,8 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 
 ### Content
 
-- **160 link cards** across 6 categories on the home page
-- **30 domain / DNS links** on a dedicated sub-page
+- **164 link cards** across 6 categories on the home page
+- **32 domain / DNS links** on a dedicated sub-page
 - Every external link opens in a new tab with `rel="noopener noreferrer"`
 
 ### Technical Improvements
@@ -50,7 +50,7 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 ├── .github/
 │   └── workflows/deploy.yml  # CI: build and deploy to GitHub Pages
 ├── public/
-│   ├── links.json            # Centralized link data (6 categories / 160 home cards + 30 domain cards)
+│   ├── links.json            # Centralized link data (6 categories / 164 home cards + 32 domain cards)
 │   ├── favicon.svg           # Site icon
 │   ├── og-card.svg/.png      # Social share card (SVG source + rendered 1200×630 PNG for og:image)
 │   └── CNAME                 # GitHub Pages custom domain (solidp.ndjp.net)
@@ -75,9 +75,9 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 
 | Category | ID | Cards |
 | --- | --- | --- |
-| Ai搜索 | `ai-search` | 54 |
-| 托管社交 | `social` | 22 |
-| 实用工具 | `tools` | 60 |
+| Ai搜索 | `ai-search` | 55 |
+| 托管社交 | `social` | 23 |
+| 实用工具 | `tools` | 62 |
 | 科技资讯 | `tech-news` | 9 |
 | 云存储 | `cloud-storage` | 7 |
 | 电子邮箱 | `email` | 8 |
@@ -260,8 +260,8 @@ This project is open-source and available under the MIT License.
 
 ### 内容规模
 
-- 首页 **6 个分类、160 张链接卡片**
-- 独立子页收录 **30 个域名 / DNS 相关链接**
+- 首页 **6 个分类、164 张链接卡片**
+- 独立子页收录 **32 个域名 / DNS 相关链接**
 - 所有外部链接均在新标签页打开，并带 `rel="noopener noreferrer"`
 
 ### 技术改进
@@ -282,7 +282,7 @@ This project is open-source and available under the MIT License.
 ├── .github/
 │   └── workflows/deploy.yml  # CI：构建并部署到 GitHub Pages
 ├── public/
-│   ├── links.json            # 集中式链接数据源（首页 6 个分类 160 张卡片 + 子页 30 张卡片）
+│   ├── links.json            # 集中式链接数据源（首页 6 个分类 164 张卡片 + 子页 32 张卡片）
 │   ├── favicon.svg           # 站点图标
 │   ├── og-card.svg/.png      # 社交分享卡片（SVG 源文件 + 渲染好的 1200×630 PNG，og:image 用）
 │   └── CNAME                 # GitHub Pages 自定义域名（solidp.ndjp.net）
@@ -307,9 +307,9 @@ This project is open-source and available under the MIT License.
 
 | 分类 | ID | 卡片数 |
 | --- | --- | --- |
-| Ai搜索 | `ai-search` | 54 |
-| 托管社交 | `social` | 22 |
-| 实用工具 | `tools` | 60 |
+| Ai搜索 | `ai-search` | 55 |
+| 托管社交 | `social` | 23 |
+| 实用工具 | `tools` | 62 |
 | 科技资讯 | `tech-news` | 9 |
 | 云存储 | `cloud-storage` | 7 |
 | 电子邮箱 | `email` | 8 |
