@@ -14,6 +14,7 @@ export default function TopNav(props: {
               <a
                 href={item.href}
                 class={{ active: props.activeHash === item.href }}
+                aria-current={props.activeHash === item.href ? "true" : undefined}
                 onClick={(event) => props.onNavigate(event, item.href)}
               >
                 {item.label}

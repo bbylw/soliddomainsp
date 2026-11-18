@@ -7,6 +7,7 @@
   <title>免费域名 / DNS托管 - WebNav Hub</title>
   <meta name="description" content="WebNav Hub 精选免费域名注册、DNS 解析托管、廉价域名注册商与 DNS 查询工具导航。" />
   <meta name="theme-color" content="#0d0d0d" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="canonical" href="https://solidp.ndjp.net/domains.html" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="免费域名 / DNS托管 - WebNav Hub" />
@@ -18,13 +19,25 @@
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.0/css/all.min.css" integrity="sha384-sTlsophtwz/I4myskS3OIJf5VvEojkXKZyBTWZm0YD/K1pN7C5wpBPLyrsbr1SU2" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/src/icons.css" />
+  <link rel="preload" href="/src/assets/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/src/assets/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/links.json" as="fetch" crossorigin />
+  <script type="speculationrules">
+    {
+      "prefetch": [{ "urls": ["index.html"], "eagerness": "eager" }],
+      "prerender": [{ "urls": ["index.html"], "eagerness": "moderate" }]
+    }
+  </script>
 </head>
 
 <body>
   <div id="root"></div>
-  <script type="module" src="/src/domains.tsx"></script>
+  <noscript>
+    <p class="load-status">请启用 JavaScript 以加载域名导航列表。</p>
+  </noscript>
+  <script type="module" src="/src/domains.tsx" blocking="render"></script>
 </body>
 
 </html>

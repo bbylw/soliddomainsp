@@ -28,7 +28,6 @@ export default function Domains() {
             </Errored>
           </div>
         </section>
-        <noscript>请启用 JavaScript 以加载域名导航列表。</noscript>
       </main>
       <SiteFooter />
     </>

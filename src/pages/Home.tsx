@@ -25,17 +25,20 @@ export default function Home() {
   const data = createLinks();
   const [activeHash, setActiveHash] = createSignal(NAV_ITEMS[0].href);
   const navState: NavState = { pinnedHash: null };
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let pinTimer: number | undefined;
 
   function releaseActiveHashPin() {
     window.clearTimeout(pinTimer);
     window.removeEventListener("scroll", scheduleActiveHashPinRelease);
+    window.removeEventListener("scrollend", releaseActiveHashPin);
     navState.pinnedHash = null;
   }
 
   function scheduleActiveHashPinRelease() {
-    // A smooth scroll keeps emitting scroll events, so the pin lifts only once
-    // the page has been still for a moment (also covers interrupted scrolls).
+    // Fallback for browsers without scrollend: a smooth scroll keeps emitting
+    // scroll events, so the pin lifts only once the page has been still for a
+    // moment (also covers interrupted scrolls and zero-distance scrolls).
     window.clearTimeout(pinTimer);
     pinTimer = window.setTimeout(releaseActiveHashPin, 150);
   }
@@ -46,6 +49,8 @@ export default function Home() {
     window.addEventListener("scroll", scheduleActiveHashPinRelease, {
       passive: true,
     });
+    // scrollend releases the pin exactly when the scroll settles
+    window.addEventListener("scrollend", releaseActiveHashPin);
     scheduleActiveHashPinRelease();
   }
 
@@ -54,7 +59,9 @@ export default function Home() {
     if (!target) return undefined;
 
     pinActiveHash(hash);
-    target.scrollIntoView({ behavior: "smooth" });
+    target.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth" });
+    // Move keyboard/AT focus to the section without a second competing scroll
+    target.focus({ preventScroll: true });
     return target;
   };
 
@@ -104,7 +111,6 @@ export default function Home() {
             </Show>
           </Loading>
         </Errored>
-        <noscript>请启用 JavaScript 以加载导航卡片列表。</noscript>
       </main>
       <SiteFooter />
     </>
@@ -174,7 +180,7 @@ function CategorySections(props: {
   return (
     <For each={props.links.categories}>
       {(category) => (
-        <section id={category.id}>
+        <section id={category.id} tabindex="-1">
           <h2 class="category-title">{category.title}</h2>
           <div class="link-grid">
             <For each={category.links}>
