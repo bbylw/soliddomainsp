@@ -13,7 +13,7 @@ export default function TopNav(props: {
             <li>
               <a
                 href={item.href}
-                classList={{ active: props.activeHash === item.href }}
+                class={{ active: props.activeHash === item.href }}
                 onClick={(event) => props.onNavigate(event, item.href)}
               >
                 {item.label}

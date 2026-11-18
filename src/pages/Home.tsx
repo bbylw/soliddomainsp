@@ -1,32 +1,37 @@
 import {
+  Errored,
   For,
+  Loading,
   Show,
   createEffect,
   createSignal,
-  onCleanup,
-  onMount,
+  onSettled,
 } from "solid-js";
+import type { LinksData } from "../types";
 import LinkCard from "../components/LinkCard";
-import LoadState from "../components/LoadState";
+import { ErrorState, LoadingState } from "../components/LoadState";
 import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
 import TopNav from "../components/TopNav";
-import { createLinksResource } from "../data/links";
+import { createLinks } from "../data/links";
 import { NAV_ITEMS } from "../nav";
 
+interface NavState {
+  clickScrolling: boolean;
+}
+
 export default function Home() {
-  const [data, { refetch }] = createLinksResource();
+  const data = createLinks();
   const [activeHash, setActiveHash] = createSignal(NAV_ITEMS[0].href);
-  let mainEl!: HTMLElement;
+  const navState: NavState = { clickScrolling: false };
   let scrollTimer: number | undefined;
-  let clickScrolling = false;
 
   const handleNavigate = (event: MouseEvent, href: string) => {
     event.preventDefault();
     const target = document.getElementById(href.slice(1));
     if (!target) return;
 
-    clickScrolling = true;
+    navState.clickScrolling = true;
     window.clearTimeout(scrollTimer);
     setActiveHash(href);
 
@@ -36,7 +41,7 @@ export default function Home() {
     history.pushState({ path: url }, "", url);
 
     scrollTimer = window.setTimeout(() => {
-      clickScrolling = false;
+      navState.clickScrolling = false;
     }, 700);
   };
 
@@ -54,66 +59,87 @@ export default function Home() {
     setActiveHash(hash);
   };
 
-  onMount(() => {
+  onSettled(() => {
     window.addEventListener("hashchange", syncActiveFromHash);
-  });
 
-  onCleanup(() => {
-    window.removeEventListener("hashchange", syncActiveFromHash);
-    window.clearTimeout(scrollTimer);
-  });
-
-  createEffect(() => {
-    if (!data()) return;
-
-    const sections = mainEl.querySelectorAll("section[id]");
-    let observer: IntersectionObserver | undefined;
-
-    if ("IntersectionObserver" in window && sections.length) {
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (clickScrolling) return;
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveHash(`#${entry.target.id}`);
-            }
-          });
-        },
-        { rootMargin: "-15% 0px -75% 0px", threshold: 0 },
-      );
-      sections.forEach((section) => observer?.observe(section));
-    }
-
-    syncActiveFromHash();
-
-    onCleanup(() => observer?.disconnect());
+    return () => {
+      window.removeEventListener("hashchange", syncActiveFromHash);
+      window.clearTimeout(scrollTimer);
+    };
   });
 
   return (
     <>
       <SiteHeader />
       <TopNav activeHash={activeHash()} onNavigate={handleNavigate} />
-      <main id="app-main" data-page="home" ref={mainEl}>
-        <LoadState loading={data.loading} error={data.error} onRetry={refetch} />
-        <Show when={data()}>
-          {(links) => (
-            <For each={links().categories}>
-              {(category) => (
-                <section id={category.id}>
-                  <h2 class="category-title">{category.title}</h2>
-                  <div class="link-grid">
-                    <For each={category.links}>
-                      {(item) => <LinkCard item={item} />}
-                    </For>
-                  </div>
-                </section>
+      <main id="app-main" data-page="home">
+        <Errored fallback={(error, reset) => <ErrorState onRetry={reset} />}>
+          <Loading fallback={<LoadingState />}>
+            <Show when={data()}>
+              {(links) => (
+                <CategorySections
+                  links={links()}
+                  navState={navState}
+                  onActiveHashChange={setActiveHash}
+                  onSectionsReady={syncActiveFromHash}
+                />
               )}
-            </For>
-          )}
-        </Show>
+            </Show>
+          </Loading>
+        </Errored>
         <noscript>请启用 JavaScript 以加载导航卡片列表。</noscript>
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+function CategorySections(props: {
+  links: LinksData;
+  navState: NavState;
+  onActiveHashChange: (hash: string) => void;
+  onSectionsReady: () => void;
+}) {
+  createEffect(
+    () => props.links,
+    () => {
+      const mainEl = document.getElementById("app-main");
+      const sections = mainEl?.querySelectorAll("section[id]") ?? [];
+      let observer: IntersectionObserver | undefined;
+
+      if ("IntersectionObserver" in window && sections.length) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            if (props.navState.clickScrolling) return;
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                props.onActiveHashChange(`#${entry.target.id}`);
+              }
+            });
+          },
+          { rootMargin: "-15% 0px -75% 0px", threshold: 0 },
+        );
+        sections.forEach((section) => observer?.observe(section));
+      }
+
+      props.onSectionsReady();
+
+      return () => observer?.disconnect();
+    },
+  );
+
+  return (
+    <For each={props.links.categories}>
+      {(category) => (
+        <section id={category.id}>
+          <h2 class="category-title">{category.title}</h2>
+          <div class="link-grid">
+            <For each={category.links}>
+              {(item) => <LinkCard item={item} />}
+            </For>
+          </div>
+        </section>
+      )}
+    </For>
   );
 }

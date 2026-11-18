@@ -1,4 +1,4 @@
-import { createResource } from "solid-js";
+import { createMemo } from "solid-js";
 import type { LinksData } from "../types";
 
 async function loadLinks(): Promise<LinksData> {
@@ -9,6 +9,7 @@ async function loadLinks(): Promise<LinksData> {
   return response.json();
 }
 
-export function createLinksResource() {
-  return createResource(loadLinks);
+/** Async computation: read the result under a `<Loading>` boundary. */
+export function createLinks() {
+  return createMemo(() => loadLinks());
 }

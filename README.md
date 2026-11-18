@@ -34,7 +34,7 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 
 ### Technical Improvements
 
-- Built with **SolidJS 1.9** (latest release), **Vite 8**, and **TypeScript**, compiled to static HTML/CSS/JS
+- Built with **SolidJS 2.0**, **Vite 8**, and **TypeScript**, compiled to static HTML/CSS/JS
 - Fine-grained reactivity with Solid signals drives link rendering, active navigation state, and hash sync — no virtual DOM
 - Data-driven architecture: categories, links, and the domain page all come from `public/links.json` at runtime, decoupled from markup
 - Multi-page Vite build preserves the original `index.html` and `domains.html` URLs while sharing one component tree
@@ -266,7 +266,7 @@ This project is open-source and available under the MIT License.
 
 ### 技术改进
 
-- 基于 **SolidJS 1.9**（当前最新发行版）、**Vite 8** 与 **TypeScript** 构建，编译为静态 HTML/CSS/JS
+- 基于 **SolidJS 2.0**、**Vite 8** 与 **TypeScript** 构建，编译为静态 HTML/CSS/JS
 - 使用 Solid 细粒度响应式信号驱动卡片渲染、导航高亮与 hash 同步，无虚拟 DOM
 - 数据与视图解耦：分类、链接与域名子页数据统一在 `public/links.json` 中维护，运行时加载
 - Vite 多页构建保留原有 `index.html` 与 `domains.html` 路径，同时共用一套 Solid 组件
