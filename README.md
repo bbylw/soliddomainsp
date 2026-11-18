@@ -40,9 +40,47 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 - Multi-page Vite build preserves the original `index.html` and `domains.html` URLs while sharing one component tree
 - Semantic card markup (`<a class="link-card">`) with `:focus-visible` keyboard navigation support
 - Smooth anchor navigation with `scroll-margin-top`, a scroll-position ScrollSpy, and `history.pushState` hash sync
-- Complete SEO & Open Graph metadata (with a 1200×630 PNG share card), SRI on the CDN stylesheet, and `preconnect` optimization
+- Complete SEO & Open Graph metadata (with a 1200×630 PNG share card) and a `strict-origin-when-cross-origin` referrer policy
+- Self-hosted Font Awesome 7.3.0 icon subset (~16KB of woff2 for all 126 used icons) — no third-party CDN, no render-blocking external stylesheet
+- Cross-document view transitions between the two pages, plus Speculation Rules (eager prefetch + hover prerender) for near-instant navigation
 - CSS custom properties for the color palette and four responsive breakpoints (1200px / 768px / 480px / 360px)
 - Custom SVG favicon, no bitmap assets required
+
+## 🧭 Modern Web Guidance
+
+This project follows [GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance) — a set of agent skills stewarded by the Google Chrome, Microsoft Edge, Mozilla Firefox, and MDN teams that embed current web-platform best practices, browser-compatibility (Baseline) data, and fallback strategies directly into coding agents. It steers implementations away from legacy patterns and toward native platform capabilities.
+
+The skill exposes a local, offline CLI (`npx modern-web-guidance@latest`) with a simple workflow:
+
+```sh
+# 1. Find the right guide with a short, capability-focused query
+npx -y modern-web-guidance@latest search "scrollspy navigation highlight"
+
+# 2. Retrieve the full guide (patterns, gotchas, fallbacks)
+npx -y modern-web-guidance@latest retrieve "scrollspy"
+
+# 3. Audit an existing codebase for legacy patterns
+npx -y modern-web-guidance@latest legacy-scan . --json
+```
+
+Guides consulted while modernizing this site (UI kept pixel-identical):
+
+| Guide | What it shaped here |
+| --- | --- |
+| `performance` | Self-hosting the critical icon dependency; head-level CSS; preloading `links.json` and above-the-fold fonts |
+| `optimize-preload-priority` | `fetchpriority` / `crossorigin` on font and fetch preloads |
+| `improve-next-page-load-performance` | Speculation Rules: eager prefetch + `moderate` prerender between `index.html` and `domains.html` |
+| `cross-document-transitions` | `@view-transition { navigation: auto }` gated behind `prefers-reduced-motion: no-preference` |
+| `consistent-cross-document-transitions` | `blocking="render"` on the entry module so transitions snapshot the rendered shell |
+| `motion` | Spatial card motion is opt-in via `no-preference`; color/shadow feedback stays for everyone |
+| `scrollspy` | `aria-current` on the active nav link; focusable section targets (`tabindex="-1"`) |
+| `scroll-completion-effects` | ScrollSpy pin released on `scrollend` with an idle-timer fallback; focus moved with `preventScroll` |
+| `browser-ui-theming` | `color-scheme: dark`, `accent-color`, `::selection` |
+| `customize-scrollbar-color-and-thickness` | `scrollbar-color` (≥3:1 thumb contrast) with a `::-webkit-scrollbar` fallback |
+| `secure-external-subresources` | Removing the CDN removed the SRI surface; document-level referrer policy added |
+| `respect-os-text-scale` | Percentage root font sizes so user font-size preferences apply |
+
+To install the skill for your own agent workflow, see the [upstream quickstart](https://github.com/GoogleChrome/modern-web-guidance#-quickstart) (`npx modern-web-guidance@latest install`) or the [documentation](https://developer.chrome.com/docs/modern-web-guidance).
 
 ## 📂 Project Structure
 
@@ -54,12 +92,16 @@ This project's UI design and color scheme is directly inspired by Pornhub's icon
 │   ├── favicon.svg           # Site icon
 │   ├── og-card.svg/.png      # Social share card (SVG source + rendered 1200×630 PNG for og:image)
 │   └── CNAME                 # GitHub Pages custom domain (solidp.ndjp.net)
+├── scripts/
+│   └── build-icon-subset.py  # Regenerates the Font Awesome subset from links.json icon usage
 ├── src/
+│   ├── assets/fonts/         # Self-hosted Font Awesome 7.3.0 subset (woff2, ~16KB total)
 │   ├── components/           # LinkCard, SiteHeader, TopNav, SiteFooter
 │   ├── data/links.ts         # Runtime loader for links.json
 │   ├── pages/                # Home and Domains page components
 │   ├── home.tsx              # Home entry (mounts the Solid app)
 │   ├── domains.tsx           # Domains entry (mounts the Solid app)
+│   ├── icons.css             # Generated icon subset CSS (@font-face + used icon classes)
 │   ├── nav.ts                # Top navigation items
 │   └── types.ts              # Shared link/category types
 ├── index.html                # Vite entry — home page
@@ -181,6 +223,13 @@ Append an entry to the target category's `links` array (or to the `domains` arra
 
 For internal links that should open in the same tab, add `"internal": true`. At runtime, the Solid app renders each item as a semantic `<a class="link-card">` element.
 
+> **New icon class?** The site ships a Font Awesome subset covering exactly the icons used in `links.json`. If your entry introduces an icon class that isn't used yet, regenerate the subset:
+>
+> ```sh
+> pip install fonttools brotli
+> python3 scripts/build-icon-subset.py
+> ```
+
 ### Adding a New Category
 
 1. Add a new category object to the `categories` array in `public/links.json`:
@@ -224,6 +273,7 @@ All colors live in the `:root` block at the top of `style.css`:
 
 - Modern browsers with CSS Grid, native ES modules and `fetch` support
 - Responsive down to 360px viewport width
+- View transitions, Speculation Rules, `scrollend`, and scrollbar theming are progressive enhancements — unsupported browsers get standard navigation and default browser UI with no loss of functionality
 
 ## 🔒 Security
 
@@ -272,9 +322,47 @@ This project is open-source and available under the MIT License.
 - Vite 多页构建保留原有 `index.html` 与 `domains.html` 路径，同时共用一套 Solid 组件
 - 语义化卡片结构（`<a class="link-card">`），支持 `:focus-visible` 键盘无障碍导航
 - 锚点导航平滑滚动（带 `scroll-margin-top` 防遮挡），配合基于滚动位置的 ScrollSpy 监听与 `history.pushState` 自动同步高亮和地址栏
-- 完善的 SEO 与 Open Graph 社交分享元数据（含 1200×630 PNG 分享卡），CDN 样式表带 SRI 完整性校验，以及 `preconnect` 预连接优化
+- 完善的 SEO 与 Open Graph 社交分享元数据（含 1200×630 PNG 分享卡），并设置 `strict-origin-when-cross-origin` Referrer 策略
+- 自托管 Font Awesome 7.3.0 图标子集（全部 126 个在用图标仅 ~16KB woff2）——无第三方 CDN，无阻塞渲染的外部样式表
+- 两页之间启用跨文档 View Transitions，并通过 Speculation Rules（eager 预取 + 悬停预渲染）实现近乎即时的页面切换
 - 使用 CSS 自定义属性管理配色，精简四档响应式断点（1200px / 768px / 480px / 360px）
 - 自绘 SVG 图标，不依赖任何位图资源
+
+## 🧭 Modern Web Guidance
+
+本项目遵循 [GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance) 指南完成现代化优化。这是一套由 Google Chrome、Microsoft Edge、Mozilla Firefox 与 MDN 团队共同维护的 Agent 技能包，将最新的 Web 平台最佳实践、浏览器兼容性（Baseline）数据与回退策略直接注入编码 Agent，引导实现远离过时模式、拥抱原生平台能力。
+
+该技能提供一个完全本地、离线可用的 CLI（`npx modern-web-guidance@latest`），工作流非常简单：
+
+```sh
+# 1. 用简短的能力描述检索最匹配的指南
+npx -y modern-web-guidance@latest search "scrollspy navigation highlight"
+
+# 2. 取回完整指南（模式、陷阱、回退方案）
+npx -y modern-web-guidance@latest retrieve "scrollspy"
+
+# 3. 扫描现有代码库中的过时模式
+npx -y modern-web-guidance@latest legacy-scan . --json
+```
+
+本次现代化中参考的指南（UI 保持逐像素一致）：
+
+| 指南 | 在本项目中的落地 |
+| --- | --- |
+| `performance` | 关键图标依赖自托管；CSS 置于 head；预加载 `links.json` 与首屏字体 |
+| `optimize-preload-priority` | 字体与 fetch 预加载的 `fetchpriority` / `crossorigin` 设置 |
+| `improve-next-page-load-performance` | Speculation Rules：`index.html` 与 `domains.html` 之间 eager 预取 + `moderate` 预渲染 |
+| `cross-document-transitions` | `@view-transition { navigation: auto }`，并以 `prefers-reduced-motion: no-preference` 门控 |
+| `consistent-cross-document-transitions` | 入口模块加 `blocking="render"`，保证过渡快照捕获已渲染的页面壳 |
+| `motion` | 卡片位移动效改为 `no-preference` 内启用；颜色/阴影反馈对所有人保留 |
+| `scrollspy` | 激活导航链接同步 `aria-current`；目标区块可聚焦（`tabindex="-1"`） |
+| `scroll-completion-effects` | ScrollSpy 钉住在 `scrollend` 精确释放（空闲计时器回退）；焦点以 `preventScroll` 移动 |
+| `browser-ui-theming` | `color-scheme: dark`、`accent-color`、`::selection` |
+| `customize-scrollbar-color-and-thickness` | `scrollbar-color`（滑块对比度 ≥3:1）+ `::-webkit-scrollbar` 回退 |
+| `secure-external-subresources` | 移除 CDN 即消除 SRI 攻击面；补充文档级 Referrer 策略 |
+| `respect-os-text-scale` | 根字号改用百分比，尊重用户字号偏好 |
+
+如需在自己的 Agent 工作流中安装该技能，参见[上游快速开始](https://github.com/GoogleChrome/modern-web-guidance#-quickstart)（`npx modern-web-guidance@latest install`）或[官方文档](https://developer.chrome.com/docs/modern-web-guidance)。
 
 ## 📂 项目结构
 
@@ -286,12 +374,16 @@ This project is open-source and available under the MIT License.
 │   ├── favicon.svg           # 站点图标
 │   ├── og-card.svg/.png      # 社交分享卡片（SVG 源文件 + 渲染好的 1200×630 PNG，og:image 用）
 │   └── CNAME                 # GitHub Pages 自定义域名（solidp.ndjp.net）
+├── scripts/
+│   └── build-icon-subset.py  # 按 links.json 图标用量重新生成 Font Awesome 子集
 ├── src/
+│   ├── assets/fonts/         # 自托管 Font Awesome 7.3.0 子集（woff2，共 ~16KB）
 │   ├── components/           # LinkCard、SiteHeader、TopNav、SiteFooter 组件
 │   ├── data/links.ts         # links.json 运行时加载器
 │   ├── pages/                # 首页与域名子页组件
 │   ├── home.tsx              # 首页入口（挂载 Solid 应用）
 │   ├── domains.tsx           # 域名页入口（挂载 Solid 应用）
+│   ├── icons.css             # 生成的图标子集 CSS（@font-face + 在用图标类）
 │   ├── nav.ts                # 顶部导航项
 │   └── types.ts              # 链接与分类类型定义
 ├── index.html                # Vite 入口 — 首页
@@ -413,6 +505,13 @@ Vercel 能识别 `bun.lock`，会自动使用 Bun 安装依赖。
 
 如果是站内跳转链接（无需新标签页打开），可额外加上 `"internal": true`。Solid 应用会在运行时将其渲染为语义化的 `<a class="link-card">` 元素。
 
+> **用到了新图标类？** 站点内置的 Font Awesome 子集只覆盖 `links.json` 中实际使用的图标。如果新条目引入了尚未使用的图标类，请重新生成子集：
+>
+> ```sh
+> pip install fonttools brotli
+> python3 scripts/build-icon-subset.py
+> ```
+
 ### 添加新分类
 
 1. 在 `public/links.json` 的 `categories` 数组中新增一个分类对象：
@@ -456,6 +555,7 @@ Solid 应用会自动渲染该分类区块，并绑定平滑滚动与 ScrollSpy 
 
 - 支持具有 CSS Grid、原生 ES modules、`fetch` 功能的现代浏览器
 - 响应式适配至 360px 视口宽度
+- View Transitions、Speculation Rules、`scrollend` 与滚动条主题化均为渐进增强——不支持的浏览器自动回退为标准导航与默认浏览器 UI，功能不受影响
 
 ## 🔒 安全性
 
